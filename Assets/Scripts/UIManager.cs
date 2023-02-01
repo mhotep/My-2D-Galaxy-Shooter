@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
-//using Image = UnityEngine.UIElements.Image;
+using System.Threading;
 
 
 public class UIManager : MonoBehaviour
@@ -14,6 +14,8 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI _scoreText;
     [SerializeField]
     private TextMeshProUGUI _gameOvertext;
+    [SerializeField]
+    private TextMeshProUGUI _restartText;
 
     private Player _player;
 
@@ -23,13 +25,20 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Image _LivesImg;
 
-    //handle to text
-    // Start is called before the first frame update
+    private IEnumerator flickerCoroutine;
+
+    public float animSpeedInSec = 1f;
+    bool keepAnimating = false;
+
+    [SerializeField]
+    private GameManager _gameManager;
+
     void Start()
     {
         _player = GameObject.Find("Player").GetComponent<Player>();
         _scoreText.text = "Score:" + 00;
-     }
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+    }
 
     public void Updatescore()
     {
@@ -43,15 +52,110 @@ public class UIManager : MonoBehaviour
 
     public void UpdateLives(int currentLives)
     {
-        //display img sprite
-        //give it a new one based on the currentLives index
         _LivesImg.sprite = _liveSprites[currentLives];
+
         if (currentLives == 0)
         {
-            Debug.Log("game over");
-            
-            _gameOvertext.enabled = true;
-            _gameOvertext.gameObject.SetActive(true);
+            GameOver();
         }
     }
+
+    public void GameOver()
+    {
+        if (_gameManager == null)
+        {
+            Debug.Log("GameManager is null.");
+        }
+
+            _restartText.enabled = true;
+            _restartText.gameObject.SetActive(true);
+            _gameManager.GameOver();
+            flickerCoroutine = ScreenFlicker();
+            StartCoroutine(flickerCoroutine);
+    }
+
+    IEnumerator ScreenFlicker()
+    {
+        {
+            _gameOvertext.enabled = true;
+            _gameOvertext.gameObject.SetActive(true);
+            keepAnimating   = true;
+            Color currentColor = _gameOvertext.color;
+
+            Color invisibleColor = _gameOvertext.color;
+            invisibleColor.a = 0; //Set Alpha to 0
+
+            float oldAnimSpeedInSec = animSpeedInSec;
+            float counter = 0;
+            while (keepAnimating)
+            {
+                //Hide Slowly
+                while (counter < oldAnimSpeedInSec)
+                {
+                    if (!keepAnimating)
+                    {
+                        yield break;
+                    }
+
+                    //Reset counter when Speed is changed
+                    if (oldAnimSpeedInSec != animSpeedInSec)
+                    {
+                        counter = 0;
+                        oldAnimSpeedInSec = animSpeedInSec;
+                    }
+
+                    counter += Time.deltaTime;
+                    _gameOvertext.color = Color.Lerp(currentColor, invisibleColor, counter / oldAnimSpeedInSec);
+                    yield return null;
+                }
+
+                yield return null;
+
+
+                //Show Slowly
+                while (counter > 0)
+                {
+                    if (!keepAnimating)
+                    {
+                        yield break;
+                    }
+
+                    //Reset counter when Speed is changed
+                    if (oldAnimSpeedInSec != animSpeedInSec)
+                    {
+                        counter = 0;
+                        oldAnimSpeedInSec = animSpeedInSec;
+                    }
+
+                    counter -= Time.deltaTime;
+                    _gameOvertext.color = Color.Lerp(currentColor, invisibleColor, counter / oldAnimSpeedInSec);
+                    yield return null;
+                }
+            }
+        }
+    }
+
+    //Call to Start animation
+    void startTextMeshAnimation()
+    {
+        if (keepAnimating)
+        {
+            return;
+        }
+        keepAnimating = true;
+        StartCoroutine(ScreenFlicker());
+    }
+
+    //Call to Change animation Speed
+    void changeTextMeshAnimationSpeed(float animSpeed)
+    {
+        animSpeedInSec = animSpeed;
+    }
+
+    //Call to Stop animation
+    void stopTextMeshAnimation()
+    {
+        keepAnimating = false;
+    }
+         
 }
