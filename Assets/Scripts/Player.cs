@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnmanager;
+    private UIManager _uiManager;
 
     private bool _isTripleShotActive = false;
     private bool _isShieldActive = false;
@@ -28,15 +29,25 @@ public class Player : MonoBehaviour
     //variable reference to the shield visualizer
     private GameObject _shieldActive;
 
+    [SerializeField]
+    private int _score;
+
     // Start is called before the first frame update
     void Start()
     {
 
-        _spawnmanager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>(); //find the object
+        _spawnmanager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
 
         if (_spawnmanager == null)
         {
             Debug.LogError("The SpawnManager is Null");
+        }
+
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("The UIManager is Null");
         }
     }
 
@@ -99,13 +110,14 @@ public class Player : MonoBehaviour
         if (_isShieldActive)
         {
             _isShieldActive = false;
-            //disable shield visualizer
             _shieldActive = this.gameObject.transform.GetChild(0).gameObject;
             _shieldActive.SetActive(false);
             return;
         }
 
         _lives -= 1;
+
+        _uiManager.UpdateLives(_lives);
 
         if (_lives < 1)
         {
@@ -143,9 +155,13 @@ public class Player : MonoBehaviour
     public void ShieldsActive()
     { 
         _isShieldActive = true;
-        //enable to shield visualizer.
         _shieldActive = this.gameObject.transform.GetChild(0).gameObject;
         _shieldActive.SetActive(true);
     }
 
+    public string GetScore(int points)
+    {
+        _score += points;
+        return _score.ToString(); 
+    }
 }

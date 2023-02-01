@@ -9,6 +9,9 @@ public class Enemy : MonoBehaviour
     private float _speed = 4.0f;
     private float randomX;
 
+    private UIManager _uimanager;
+    private Player _player;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,10 +35,10 @@ public class Enemy : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            Player player = other.transform.GetComponent<Player>();
-            if (player != null) 
+            Player _player = other.transform.GetComponent<Player>();
+            if (_player != null) 
             {
-                player.Damage();
+                _player.Damage();
                 Destroy(this.gameObject);
             }
             
@@ -44,8 +47,15 @@ public class Enemy : MonoBehaviour
         if (other.tag == "Laser")
         {
 
-                Destroy(other.gameObject);
-                Destroy(this.gameObject);
+            Destroy(other.gameObject);
+                
+            //update UI with new score
+            _uimanager = GameObject.Find("Canvas").GetComponent<UIManager>();
+            if (_uimanager != null)
+            {
+                _uimanager.Updatescore();
+            }
+            Destroy(this.gameObject);
             
         }
     }
