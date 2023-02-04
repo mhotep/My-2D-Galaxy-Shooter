@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
         //restart the current scene
         if (Input.GetKeyDown(KeyCode.R) && _isGameOver )
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(1); //load current scene
         }
     }
 
@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
     {
         if (_isGameOver == false)
         {
-            Debug.Log("game over true");
             _isGameOver= true;
         }
 

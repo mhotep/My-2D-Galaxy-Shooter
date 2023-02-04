@@ -11,11 +11,14 @@ public class Enemy : MonoBehaviour
 
     private UIManager _uimanager;
     private Player _player;
+    // get handle to the animator component
+    private Animator _explosionAnim;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        //assign the animator component to anim
+        _explosionAnim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -39,7 +42,10 @@ public class Enemy : MonoBehaviour
             if (_player != null) 
             {
                 _player.Damage();
-                Destroy(this.gameObject);
+                //trigger anim
+                _explosionAnim.SetTrigger("OnEnemyDeath");
+                _speed = 0;
+                Destroy(this.gameObject, 2.8f);
             }
             
         }
@@ -55,7 +61,10 @@ public class Enemy : MonoBehaviour
             {
                 _uimanager.Updatescore();
             }
-            Destroy(this.gameObject);
+            //trigger anim
+            _explosionAnim.SetTrigger("OnEnemyDeath");
+            _speed = 0;
+            Destroy(this.gameObject, 2.8f);
             
         }
     }

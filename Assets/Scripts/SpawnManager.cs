@@ -33,7 +33,7 @@ public class SpawnManager : MonoBehaviour
         while (_stopSpawning == false) 
         {
             var xPosition = Random.Range(-10.0f, 10.0f);
-            GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(xPosition, 10.8f, 0), Quaternion.identity);
+            GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(xPosition, 8.8f, 0), Quaternion.identity);
             newEnemy.transform.parent = _container.transform;
             yield return new WaitForSeconds(5);
         }
@@ -47,7 +47,7 @@ public class SpawnManager : MonoBehaviour
             var spawnTime = Random.Range(3, 8);
             var xPosition = Random.Range(-10.0f, 10.0f);
             int randomPowerup = Random.Range(0, 3);
-            GameObject newPowerup = Instantiate(powerups[randomPowerup], new Vector3(xPosition, 10.0f,0), Quaternion.identity);
+            GameObject newPowerup = Instantiate(powerups[randomPowerup], new Vector3(xPosition, 8.0f,0), Quaternion.identity);
             yield return new WaitForSeconds(spawnTime);
         }
     }
