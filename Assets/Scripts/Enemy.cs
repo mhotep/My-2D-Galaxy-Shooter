@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -13,12 +14,14 @@ public class Enemy : MonoBehaviour
     private Player _player;
     // get handle to the animator component
     private Animator _explosionAnim;
+    private AudioSource _audioSource;
 
     // Start is called before the first frame update
     void Start()
     {
         //assign the animator component to anim
         _explosionAnim = GetComponent<Animator>();
+        _audioSource  = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -43,9 +46,7 @@ public class Enemy : MonoBehaviour
             {
                 _player.Damage();
                 //trigger anim
-                _explosionAnim.SetTrigger("OnEnemyDeath");
-                _speed = 0;
-                Destroy(this.gameObject, 2.8f);
+                Explosion();
             }
             
         }
@@ -61,12 +62,18 @@ public class Enemy : MonoBehaviour
             {
                 _uimanager.Updatescore();
             }
-            //trigger anim
-            _explosionAnim.SetTrigger("OnEnemyDeath");
-            _speed = 0;
-            Destroy(this.gameObject, 2.8f);
-            
+            Explosion();
         }
+    }
+
+    void Explosion()
+
+    {
+        _explosionAnim.SetTrigger("OnEnemyDeath");
+        _speed = 0;
+        _audioSource.Play();
+        Destroy(this.gameObject, 2.8f);
+
     }
 
 }
