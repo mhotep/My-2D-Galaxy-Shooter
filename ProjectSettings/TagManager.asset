@@ -8,6 +8,7 @@ TagManager:
   - Laser
   - TripleShot
   - Shield
+  - EnemyLaser
   layers:
   - Default
   - TransparentFX

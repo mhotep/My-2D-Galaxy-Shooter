@@ -16,16 +16,39 @@ public class Enemy : MonoBehaviour
     private Animator _explosionAnim;
     private AudioSource _audioSource;
 
+    [SerializeField]
+    private GameObject _laserPrefab;
+    private float _canfire = -1;
+    private float _fireRate= 3.0f;
+
     // Start is called before the first frame update
     void Start()
     {
         //assign the animator component to anim
         _explosionAnim = GetComponent<Animator>();
         _audioSource  = GetComponent<AudioSource>();
+        
     }
 
     // Update is called once per frame
     void Update()
+    {
+        CalculateMovement();
+        if (Time.time > _canfire && _speed > 0)
+        {
+            _fireRate = Random.Range(3f, 7f);
+            _canfire = Time.time + _fireRate;
+            GameObject enemyLaser = Instantiate(_laserPrefab,transform.position,Quaternion.identity);
+            Laser[] lasers= enemyLaser.GetComponentsInChildren<Laser>();
+            
+            for (int i =0; i<lasers.Length; i++) 
+            {
+                lasers[i].AssignEnemyLaser();
+            }
+        }
+    }
+    
+    void CalculateMovement()
     {
         transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
@@ -34,12 +57,12 @@ public class Enemy : MonoBehaviour
             randomX = Random.Range(-10.0f, 10.0f);
             transform.position = new Vector3(randomX, 11.0f, 0);
         }
-        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Player")
+
+        if (other.tag == "Player" && _speed > 0)
         {
             Player _player = other.transform.GetComponent<Player>();
             if (_player != null) 
@@ -53,7 +76,7 @@ public class Enemy : MonoBehaviour
 
         if (other.tag == "Laser")
         {
-
+            Destroy(GetComponent<Collider2D>());
             Destroy(other.gameObject);
                 
             //update UI with new score
@@ -72,8 +95,10 @@ public class Enemy : MonoBehaviour
         _explosionAnim.SetTrigger("OnEnemyDeath");
         _speed = 0;
         _audioSource.Play();
+
         Destroy(this.gameObject, 2.8f);
 
     }
+
 
 }
