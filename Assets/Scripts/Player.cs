@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     //declare a SErialized field private speed variable with a type of float
     [SerializeField]
     private float _speed = 3.5f;
-    private float _speedMultiplier = 2.0f;
+    private float _speedMultiplier = 3.0f;
 
     [SerializeField]
     private GameObject _laserPrefab;
@@ -22,29 +22,40 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private int _lives = 3;
-    private SpawnManager _spawnmanager;
-    private UIManager _uiManager;
 
     private bool _isTripleShotActive = false;
-    private bool _isShieldActive = false;
+
+    [SerializeField]
+    private float _thrusters = 1.0f;
     public IEnumerator _coroutine;
 
     //variable reference to the shield visualizer
     private GameObject _shieldActive;
+    //variable keeping count of shield lives.
+    private int _shieldLives;
+//    private bool _isShieldActive;
 
-    [SerializeField]
-    private int _score;
+    //private animation handle
+    private Animator _shieldAnim;
+
+    private UIManager _uiManager;
+    private SpawnManager _spawnManager;
 
     [SerializeField]
     private AudioSource _audioSource;
 
+    [SerializeField]
+    private int _score;
+
+    // int to keep count of ammo
+    private int _ammo;
+
     // Start is called before the first frame update
     void Start()
     {
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
 
-        _spawnmanager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-
-        if (_spawnmanager == null)
+        if (_spawnManager == null)
         {
             Debug.LogError("The SpawnManager is Null");
         }
@@ -62,14 +73,26 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("The AudioSource is null");
         }
+
+        _shieldActive = this.gameObject.transform.GetChild(1).gameObject;
+        _shieldAnim = _shieldActive.GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _speed == 3.5f)
+        {
+            _thrusters = 3.0f;
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _thrusters= 1.0f;
+        }
+
         CalculateMovement();
 
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire && _ammo > 0)
         {
             FireLaser();
         };
@@ -77,12 +100,13 @@ public class Player : MonoBehaviour
 
     void CalculateMovement()
     {
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalkInput = Input.GetAxis("Vertical");
 
         Vector3 direction = new Vector3(horizontalInput,verticalkInput,0);
 
-        transform.Translate(direction  * _speed * Time.deltaTime);
+        transform.Translate(direction  * _speed * _thrusters * Time.deltaTime);
 
         if (transform.position.y >= 0)
         {
@@ -117,18 +141,38 @@ public class Player : MonoBehaviour
         }
 
         _audioSource.Play(0);
-
+        _ammo -= 1;
     }
 
     public void Damage()
     {
-
-        if (_isShieldActive)
+        //change shield animation indicating damage
+        if (_shieldActive.activeSelf)
         {
-            _isShieldActive = false;
-            _shieldActive = this.gameObject.transform.GetChild(0).gameObject;
-            _shieldActive.SetActive(false);
-            return;
+                switch (_shieldLives)
+                {
+                    case 3:
+                        //change shield aniomation to indicate 1 hit
+                        _shieldAnim.SetTrigger("On1Hit");
+                        _shieldLives -= 1;
+                        //StartCoroutine(ShieldPowerDownRoutine());
+                        break;
+                    case 2:
+                        //change shield animation to indicate 2 hits
+                        _shieldAnim.SetTrigger("On2Hits");
+                        //StartCoroutine(ShieldPowerDownRoutine());
+                        _shieldLives -= 1;
+                        break;
+                    case 1:
+                        //change shield animatIon to indicate 3 hits
+                        _shieldAnim.SetTrigger("On3Hits");
+                        _shieldLives -= 1;
+                        StartCoroutine(ShieldPowerDownRoutine());
+                    break;
+                    default:
+                        break;
+                }
+                return;
         }
 
         _lives -= 1;
@@ -148,7 +192,7 @@ public class Player : MonoBehaviour
 
         if (_lives < 1)
         {
-            _spawnmanager.OnPlayerDeath();
+            _spawnManager.OnPlayerDeath();
             _uiManager.GameOver();
             Destroy(this.gameObject);
         }
@@ -170,6 +214,11 @@ public class Player : MonoBehaviour
 
     public void SpeedActive()
     {
+        if (_thrusters > 1.0f | _speed > 3.5f)
+        {
+            return;
+        }
+
         _speed *= _speedMultiplier;
         StartCoroutine(SpeedPowerDownRoutine());
     }
@@ -177,14 +226,14 @@ public class Player : MonoBehaviour
     IEnumerator SpeedPowerDownRoutine()
     {
         yield return new WaitForSeconds(5.0f);
-        _speed /= _speedMultiplier;
+        _speed = 3.5f;
     }
 
     public void ShieldsActive()
-    { 
-        _isShieldActive = true;
-        _shieldActive = this.gameObject.transform.GetChild(0).gameObject;
+    {
+        _shieldLives= 3;
         _shieldActive.SetActive(true);
+   //     _isShieldActive = true;
     }
 
     public string GetScore(int points)
@@ -193,4 +242,17 @@ public class Player : MonoBehaviour
         return _score.ToString();
     }
 
+    IEnumerator ShieldPowerDownRoutine()
+    {
+        yield return new WaitForSecondsRealtime(3);
+        _shieldActive.SetActive(false);
+    }
+
+    //return count of ammo remaining to UIManager
+    public string GetAmmo(int ammo)
+    {
+        _ammo += ammo;
+        return _ammo.ToString();
+
+    }
 }

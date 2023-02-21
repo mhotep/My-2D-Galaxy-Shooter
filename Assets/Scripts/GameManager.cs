@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private bool _isGameOver = false;
 
+
     public void Update()
     {
         // if the r key was pressed
@@ -19,6 +20,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape) ) 
         {
+            SceneManager.LoadScene(0);
             Application.Quit();
         }
     }
