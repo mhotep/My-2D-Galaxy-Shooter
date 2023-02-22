@@ -48,7 +48,7 @@ public class Player : MonoBehaviour
     private int _score;
 
     // int to keep count of ammo
-    private int _ammo;
+    private int _ammo = 16;
 
     // Start is called before the first frame update
     void Start()
@@ -142,6 +142,8 @@ public class Player : MonoBehaviour
 
         _audioSource.Play(0);
         _ammo -= 1;
+        _uiManager.UpdateAmmo(_ammo );
+        
     }
 
     public void Damage()
@@ -155,12 +157,10 @@ public class Player : MonoBehaviour
                         //change shield aniomation to indicate 1 hit
                         _shieldAnim.SetTrigger("On1Hit");
                         _shieldLives -= 1;
-                        //StartCoroutine(ShieldPowerDownRoutine());
                         break;
                     case 2:
-                        //change shield animation to indicate 2 hits
+                    //change shield animation to indicate 2 hits
                         _shieldAnim.SetTrigger("On2Hits");
-                        //StartCoroutine(ShieldPowerDownRoutine());
                         _shieldLives -= 1;
                         break;
                     case 1:
@@ -248,11 +248,14 @@ public class Player : MonoBehaviour
         _shieldActive.SetActive(false);
     }
 
-    //return count of ammo remaining to UIManager
-    public string GetAmmo(int ammo)
+    //replenish our ammo
+    public void GetAmmo()
     {
-        _ammo += ammo;
-        return _ammo.ToString();
-
+        if (_ammo < 15)
+        {
+            _ammo = 15;
+            _uiManager.UpdateAmmo(_ammo);
+        }
+            
     }
 }

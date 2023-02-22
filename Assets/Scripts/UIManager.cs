@@ -6,7 +6,8 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 using System.Threading;
-
+using System;
+using Random = UnityEngine.Random;
 
 public class UIManager : MonoBehaviour
 {
@@ -25,6 +26,12 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Image _LivesImg;
 
+    [SerializeField]
+    private  ProgressBarCircle Pb;
+
+    [SerializeField]
+    private TextMeshProUGUI _ammoText;
+
     private IEnumerator flickerCoroutine;
 
     public float animSpeedInSec = 1f;
@@ -36,8 +43,10 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _player = GameObject.Find("Player").GetComponent<Player>();
-        _scoreText.text = "Score:" + 00;
+        _scoreText.text = "Score: " + 00;
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        _ammoText.text ="Ammo: 15";
+        Pb.BarValue = 15;
     }
 
     public void Updatescore()
@@ -62,6 +71,12 @@ public class UIManager : MonoBehaviour
         {
             GameOver();
         }
+    }
+
+    public void UpdateAmmo(int currentAmmo)
+    {
+        _ammoText.text =  "Ammo: " + currentAmmo.ToString();
+        Pb.BarValue = currentAmmo;
     }
 
     public void GameOver()
