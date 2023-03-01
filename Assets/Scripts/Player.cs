@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
     private bool _isNeutrinoActive = false;
 
     private float _thrusters = 1.0f;
+
     public IEnumerator _coroutine;
 
     //variable reference to the shield
@@ -57,15 +58,12 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _thruster;
+    [SerializeField]
+    private GameObject _thrusterBoosted;
 
     private float _canThrust;
 
     private float _thrustRate = 0.05f;
-
-    [SerializeField]
-    private float _refuelspeed;
-
-    private Transform _thrusterTransform;
 
     private bool _reFueling = false;
 
@@ -92,8 +90,6 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("The AudioSource is null");
         }
-        //_thrusterTransform = this.gameObject.transform.GetChild(0).transform;
-        _thrusterTransform = _thruster.transform;
     }
 
     // Update is called once per frame
@@ -110,26 +106,29 @@ public class Player : MonoBehaviour
 
     void CalculateMovement()
     {
-        if (Input.GetKey(KeyCode.LeftShift) && Time.time > _canThrust && Mathf.RoundToInt(_fuelPercentage) > 0f && !_reFueling)
+        if (Input.GetKey(KeyCode.LeftShift) && Time.time > _canThrust && Mathf.RoundToInt(_fuelPercentage) > 0 && _reFueling == false)
         { 
             _canThrust = Time.time + _thrustRate;
             StopCoroutine(ActivateReFuel());
             ActivateThruster();
         }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+
+            _thrusterBoosted.SetActive(false);
+            _thruster.SetActive(true);
+            _thrusters = 1.0f;
+            //increment thruster bar
+            _uiManager.UpdateThruster(_fuelPercentage);
+        }
         else
         {
             if (_fuelPercentage < 1)
             {
-               StartCoroutine(ActivateReFuel()); 
+                StartCoroutine(ActivateReFuel());
+                _thrusterBoosted.SetActive(false);
+                _thruster.SetActive(true);
             }
-              
-            if (_thrusterTransform.localScale.x > .5)
-            {
-                _thrusterTransform.localScale -= new Vector3(.5f, 0f, 0f);
-            }
-            _thrusters = 1.0f;
-            //increment thruster bar
-            _uiManager.UpdateThruster(_fuelPercentage);
         }
 
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -208,7 +207,6 @@ public class Player : MonoBehaviour
             _uiManager.GameOver();
             Destroy(this.gameObject);
         }
-            
     }
 
     public void TripleShotActive()
@@ -259,9 +257,7 @@ public class Player : MonoBehaviour
         {
             _ammo = 15;
             _uiManager.UpdateAmmo(_ammo);
-
         }
-
     }
 
     //increase life
@@ -304,41 +300,37 @@ public class Player : MonoBehaviour
 
     public void ActivateThruster()
     {
-        if (_fuelPercentage > 0 || _fuelPercentage < 100)
-        {
-            _thrusters = 7.0f;
-            if (_thrusterTransform.transform.localScale.x < .5f )
+            if (Mathf.RoundToInt(_fuelPercentage) > 1 || _fuelPercentage < 100f)
             {
-                _thrusterTransform.localScale += new Vector3(1f, 0, 0);
+                _thrusters = 6.0f;
+                _thruster.SetActive(false);
+                _thrusterBoosted.SetActive(true);
+                _fuelPercentage -= 15f * 5f * Time.deltaTime;
             }
-            _fuelPercentage -= 15 * 5 * Time.deltaTime;
+            else
+            {
+                _thrusters = 1.0f;
+                _thruster.SetActive(false);
+                _thrusterBoosted.SetActive(true);
+                _fuelPercentage = 0;
+            }
+
             _uiManager.UpdateThruster(_fuelPercentage);
-        }
-        else
-        {
-                if (_thrusterTransform.transform.localScale.x > .5f)
-            {
-                _thrusterTransform.localScale -= new Vector3(.5f, 0, 0);
-            }
-            _fuelPercentage = 0;
-            _thrusters = 1.0f;
-            _uiManager.UpdateThruster(0);
-        }
     }
 
     IEnumerator ActivateReFuel()
     {
-        _reFueling = true;
-        while (_fuelPercentage < 100) 
+        while (_fuelPercentage < 100)
         {
+            _reFueling = true;
             _thrusters = 1.0f;
             yield return new WaitForSeconds(.01f);
             _fuelPercentage += 7.5f * Time.deltaTime;
             _uiManager.UpdateThruster(_fuelPercentage);
 
-            if (_fuelPercentage >= 100)
+            if (_fuelPercentage >= 100f)
             {
-                _fuelPercentage = 100;
+                _fuelPercentage = 100f;
                 _uiManager.UpdateThruster(_fuelPercentage);
                 break;
             }
