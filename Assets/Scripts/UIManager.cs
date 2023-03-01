@@ -8,6 +8,7 @@ using Image = UnityEngine.UI.Image;
 using System.Threading;
 using System;
 using Random = UnityEngine.Random;
+using Slider = UnityEngine.UI.Slider;
 
 public class UIManager : MonoBehaviour
 {
@@ -27,7 +28,13 @@ public class UIManager : MonoBehaviour
     private Image _LivesImg;
 
     [SerializeField]
-    private  ProgressBarCircle Pb;
+    private  ProgressBarCircle _progressBar;
+
+    [SerializeField]
+    private Slider _thrusterSlider;
+
+    [SerializeField]
+    private TextMeshProUGUI _thrusterPercent;
 
     [SerializeField]
     private TextMeshProUGUI _ammoText;
@@ -46,7 +53,7 @@ public class UIManager : MonoBehaviour
         _scoreText.text = "Score: " + 00;
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         _ammoText.text ="Ammo: 15";
-        Pb.BarValue = 15;
+        _progressBar.BarValue = 100;
     }
 
     public void Updatescore()
@@ -65,7 +72,6 @@ public class UIManager : MonoBehaviour
         {
             _LivesImg.sprite = _liveSprites[currentLives];
         }
-        
 
         if (currentLives == 0)
         {
@@ -76,7 +82,13 @@ public class UIManager : MonoBehaviour
     public void UpdateAmmo(int currentAmmo)
     {
         _ammoText.text =  "Ammo: " + currentAmmo.ToString();
-        Pb.BarValue = currentAmmo;
+        _progressBar.BarValue = currentAmmo;
+    }
+
+    public void UpdateThruster(float fuelPercentage)
+    {
+        _thrusterSlider.value = fuelPercentage;
+        _thrusterPercent.text = Mathf.RoundToInt(fuelPercentage) + "%";
     }
 
     public void GameOver()

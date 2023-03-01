@@ -9,6 +9,7 @@ TagManager:
   - TripleShot
   - Shield
   - EnemyLaser
+  - NeutrinoBomb
   layers:
   - Default
   - TransparentFX

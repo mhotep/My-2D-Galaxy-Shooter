@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:ProgressBar value="21.3" title="Thruster" name="ThrusterBar" />
+</ui:UXML>
