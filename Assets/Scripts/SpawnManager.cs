@@ -19,8 +19,6 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _enemyPrefab;
 
-    private IEnumerator coroutine;
-    private IEnumerator powerUpCoroutine;
     [SerializeField]
     private GameObject _container;
     [SerializeField]
@@ -31,30 +29,19 @@ public class SpawnManager : MonoBehaviour
     public int randomNumber;
     public void Start()
     {
-        //tally the total weight
-        //draw a number between zero and the total weight (100).
-        //calculate the total
 
         foreach (var item in table) 
         {
             total += item;
         }
 
-        //randomNumber = Random.Range(0, total);
-        //for (int i=0; i < table.Length; i++)
-        //{
-        //    if (randomNumber <= table[i])
-        //    {
-
-        //    }
-        //}
     }
 
     public void StartSpawning()
     {
+        StartCoroutine(Camera.main.GetComponent<CameraShakeMH>().ShakeCam(2f, 0.15f));
         StartCoroutine(SpawnEnemyRoutine());
         StartCoroutine(SpawnPowerupRoutine());
-        //StartCoroutine(RareSpawnRoutine());
     }
 
     IEnumerator SpawnEnemyRoutine()

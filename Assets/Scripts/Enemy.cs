@@ -67,6 +67,7 @@ public class Enemy : MonoBehaviour
             Player _player = other.transform.GetComponent<Player>();
             if (_player != null) 
             {
+                StartCoroutine(Camera.main.GetComponent<CameraShakeMH>().ShakeCam(.25f, 0.15f));
                 _player.Damage();
                 //trigger anim
                 Explosion();
@@ -76,7 +77,16 @@ public class Enemy : MonoBehaviour
 
         if (other.tag == "Laser" | other.tag == "NeutrinoBomb")
         {
-            Destroy(GetComponent<Collider2D>());
+            Collider2D enemyCollider = GetComponent<Collider2D>();
+            if (enemyCollider != null)
+            {
+                Destroy(enemyCollider);
+            }
+            else
+            {
+                Debug.Log(" enemy collider is null");
+            }
+            StartCoroutine(Camera.main.GetComponent<CameraShakeMH>().ShakeCam(.25f, 0.15f));
             Destroy(other.gameObject);
                 
             //update UI with new score

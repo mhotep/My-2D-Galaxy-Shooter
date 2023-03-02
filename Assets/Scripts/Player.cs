@@ -90,6 +90,8 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("The AudioSource is null");
         }
+
+        //this.gameObject.transform.GetChild(0).gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -185,10 +187,12 @@ public class Player : MonoBehaviour
         //change shield animation indicating damage
         if (_shield.gameObject.activeSelf)
         {
-                return;
+            return;
         }
 
         _lives -= 1;
+
+        StartCoroutine(Camera.main.GetComponent<CameraShakeMH>().ShakeCam(.5f, 0.15f));
 
         if (_lives == 2) //if lives equals 2 enable right engine
         {
