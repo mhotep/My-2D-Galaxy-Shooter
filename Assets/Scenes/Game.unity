@@ -1084,7 +1084,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ba96be51e5ce7040a844698358d88cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  table: 32000000280000001e000000140000000a00000005000000
+  powerupTable: 37000000320000002d000000280000002300000014000000
+  enemyTable: 0100000002000000
   _enemyPrefab: {fileID: 2995831894067447615, guid: da65f674da43e6e41b6741b1e7c7a037, type: 3}
   _container: {fileID: 657005423}
   powerups:
@@ -1094,8 +1095,13 @@ MonoBehaviour:
   - {fileID: 5931498559661466098, guid: da6ef6d744110954e8ca8a0ef4619c36, type: 3}
   - {fileID: 2701198886385088590, guid: 8764a636a09661a429e9e291a1466f8d, type: 3}
   - {fileID: 1436680142076634540, guid: c68157800d9585348ba8405b2f5de0c8, type: 3}
-  total: 0
-  randomNumber: 0
+  _enemies:
+  - {fileID: 2995831894067447615, guid: da65f674da43e6e41b6741b1e7c7a037, type: 3}
+  - {fileID: 7846160442365318410, guid: 611df33379a04f34d8d545a823ba15c6, type: 3}
+  powerupTotal: 0
+  enemyTotal: 0
+  randomPowerup: 0
+  randomEnemy: 0
 --- !u!1 &947679623
 GameObject:
   m_ObjectHideFlags: 0

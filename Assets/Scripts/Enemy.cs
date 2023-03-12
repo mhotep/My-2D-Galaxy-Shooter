@@ -1,5 +1,7 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,7 +13,6 @@ public class Enemy : MonoBehaviour
     private float randomX;
 
     private UIManager _uimanager;
-    private Player _player;
     // get handle to the animator component
     private Animator _explosionAnim;
     private AudioSource _audioSource;
@@ -24,7 +25,11 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //assign the animator component to anim
+        // redesign this so the enemy movement is random
+        // movements are weighted similar to spawnmanager spawning 
+        // MoveSin has a weight
+        // MoveCircle has a weight
+        // 
         _explosionAnim = GetComponent<Animator>();
         _audioSource  = GetComponent<AudioSource>();
         
@@ -50,13 +55,13 @@ public class Enemy : MonoBehaviour
     
     void CalculateMovement()
     {
-        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+            transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
-        if (transform.position.y <= -5f)
-        {
-            randomX = Random.Range(-10.0f, 10.0f);
-            transform.position = new Vector3(randomX, 11.0f, 0);
-        }
+            if (transform.position.y <= -5f)
+            {
+                randomX = Random.Range(-10.0f, 10.0f);
+                transform.position = new Vector3(randomX, 11.0f, 0);
+            }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -67,7 +72,6 @@ public class Enemy : MonoBehaviour
             Player _player = other.transform.GetComponent<Player>();
             if (_player != null) 
             {
-                StartCoroutine(Camera.main.GetComponent<CameraShakeMH>().ShakeCam(.25f, 0.15f));
                 _player.Damage();
                 //trigger anim
                 Explosion();
@@ -102,10 +106,11 @@ public class Enemy : MonoBehaviour
     void Explosion()
 
     {
+        
         _explosionAnim.SetTrigger("OnEnemyDeath");
         _speed = 0;
         _audioSource.Play();
-
+        transform.GetChild(0).gameObject.SetActive(false);
         Destroy(this.gameObject, 2.8f);
 
     }
